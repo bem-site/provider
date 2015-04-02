@@ -1,0 +1,24 @@
+{
+  "name": "bem-site-provider",
+  "description": "Data provider service",
+  "version": "0.0.1",
+  "authors": [
+    {
+      "name": "tormozz48",
+      "email": "tormozz48@github.com"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/bem-site/provider.git"
+  },
+  "ignore": [
+    ".enb/tmp",
+    "node_modules",
+    "libs"
+  ],
+  "dependencies": {
+    "bem-core": "git://github.com/bem/bem-core.git#v2.6.0",
+    "bem-components": "git://github.com/bem/bem-components.git#v2.1.0"
+  }
+}

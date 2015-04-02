@@ -1,0 +1,14 @@
+{
+  "path": "./",
+  "logger": {
+    "level": "debug"
+  },
+  "title": "Bem Site Provider",
+  "logs": {
+    "output": "./logs/output.log",
+    "error": "./logs/error.log"
+  },
+  "server": {
+    "port": 3000
+  }
+}

@@ -1,0 +1,17 @@
+block('header').elem('updater')(
+    content()(function() {
+        var ud = this.ctx.data;
+        return {
+            block : 'checkbox',
+            text : ud.text,
+            name: 'updater',
+            val : ud.value,
+            mods : {
+                theme : 'normal',
+                size : 'm',
+                type : 'button',
+                checked : ud.checked
+            }
+        };
+    })
+);

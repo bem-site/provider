@@ -1,0 +1,4 @@
+- mods: { action: [testing, production, remove] }
+- block: button
+  mods: { theme : 'normal', size : 'm', type : 'submit', view: 'action' }
+- block: icon

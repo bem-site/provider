@@ -1,0 +1,5 @@
+- mods: { environment: [testing, production], view: [changes] }
+- elems:
+  - title
+  - icon
+  - panel

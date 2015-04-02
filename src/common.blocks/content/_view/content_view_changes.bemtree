@@ -1,0 +1,16 @@
+block('content').mod('view', 'changes')(
+    content()(function() {
+        var date = this.ctx.data.date,
+            changes = this.ctx.data.changes
+        return [{
+            block: 'snapshot',
+            mods: { view: 'changes' },
+            date: date
+        }].concat(Object.keys(changes).map(function(key) {
+             var item = changes[key];
+             item.block = 'changes';
+             item.mods = { type: item.type };
+             return item;
+         }));
+    })
+);

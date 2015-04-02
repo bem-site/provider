@@ -1,0 +1,7 @@
+block('header').elem('title').content()(function() {
+    return {
+        block: 'link',
+        url: '/',
+        content: this.ctx.content
+    };
+});

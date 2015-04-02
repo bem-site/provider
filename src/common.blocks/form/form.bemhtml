@@ -1,0 +1,5 @@
+block('form')(
+    js()({ message: this.ctx.message }),
+    tag()('form'),
+    attrs()({ method: 'POST', action: this.ctx.action })
+)

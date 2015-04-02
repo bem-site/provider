@@ -1,0 +1,11 @@
+block('snapshot').mod('view', 'changes').content()(function() {
+    return [
+        {
+            elem: 'title',
+            content: this.ctx.date
+        },
+        {
+            elem: 'icon'
+        }
+    ];
+});

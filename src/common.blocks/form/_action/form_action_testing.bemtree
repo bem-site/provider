@@ -1,0 +1,21 @@
+block('form').mod('action', 'testing')(
+    def()(function() {
+        this.ctx.action = this.ctx.content.testingUrl;
+        this.ctx.message = 'Do you really want to put this snapshot to testing environment ?';
+        return applyNext();
+    }),
+
+    content()(function() {
+        var content = this.ctx.content,
+            disabled = this.ctx.disabled;
+
+        return {
+            block : 'button',
+            mods : { theme : 'normal', size : 'l', type : 'submit', disabled: disabled },
+            icon : {
+                block : 'icon',
+                url : 'src/common.blocks/snapshot/__panel/lab.svg'
+            }
+        };
+    })
+);

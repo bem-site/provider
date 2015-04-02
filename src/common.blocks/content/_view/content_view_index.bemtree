@@ -4,6 +4,6 @@ block('content').mod('view', 'index')(
         return data.versions.map(function(item) {
             item.block = 'snapshot';
             return item;
-        })
+        });
     })
 );

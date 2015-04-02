@@ -1,5 +1,9 @@
 block('form')(
-    js()({ message: this.ctx.message }),
+    js()(function () {
+        return { message: this.ctx.message };
+    }),
     tag()('form'),
-    attrs()({ method: 'POST', action: this.ctx.action })
-)
+    attrs()(function () {
+        return { method: 'POST', action: this.ctx.action };
+    })
+);

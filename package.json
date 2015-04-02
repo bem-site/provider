@@ -1,0 +1,67 @@
+{
+  "name": "bem-site-provider",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/bem-site/provider.git"
+  },
+  "author": "Andrey Kuznetsov <andrey.kuznetsov48@yandex.ua> (http://github.com/tormozz48)",
+  "maintainers": [
+    "Andrey Kuznetsov <andrey.kuznetsov48@yandex.ua> (http://github.com/tormozz48)"
+  ],
+  "contributors": [
+    "Andrey Kuznetsov <andrey.kuznetsov48@yandex.ua> (http://github.com/tormozz48)",
+    "Nikolay Ilchenko <tavria@yandex-team.ru> (http://github.com/tavriaforever)"
+  ],
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "dependencies": {
+    "bem-site-logger": "0.0.x",
+    "bem-site-snapshot-master": "0.0.x",
+    "body-parser": "1.8.x",
+    "cookie-parser": "1.3.x",
+    "express": "4.x",
+    "forever": "^0.14.x",
+    "fs-extra": "^0.18.x",
+    "json-stringify-safe": "5.0.x",
+    "inherit": "^2.2.x",
+    "lodash": "^3.1.x",
+    "luster": "~0.5.x",
+    "luster-log-file": "~0.2.x",
+    "moment": "^2.9.0",
+    "serve-static": "~1.1.x",
+    "vow": "~0.4.x",
+    "vow-node": "^0.2.x"
+  },
+  "devDependencies": {
+    "bower": "~1.3.x",
+    "enb": "^0.13.x",
+    "enb-autoprefixer": "^0.1.x",
+    "enb-bemxjst": "^1.2.x",
+    "enb-diverse-js": "^0.1.x",
+    "enb-modules": "^0.1.2",
+    "enb-stylus": "^1.1.x",
+    "mocha": "~2.2.x",
+    "mocha-lcov-reporter": "0.0.x",
+    "should": "~5.2.x",
+    "istanbul": "^0.3.x",
+    "jshint": "~2.6.x",
+    "jscs": "^1.11.x"
+  },
+  "scripts": {
+    "deps": "bower i",
+    "enb": "enb make --no-cache",
+    "make": "npm run deps && npm run enb",
+    "start": "node bin/single.js",
+    "cluster": "node bin/cluster.js",
+    "mocha": "NODE_ENV=testing node_modules/.bin/mocha",
+    "istanbul": "istanbul cover ./node_modules/mocha/bin/_mocha",
+    "codestyle": "node_modules/.bin/jshint . && node_modules/.bin/jscs -c .jscs.js .",
+    "cover": "istanbul cover _mocha",
+    "coveralls": "npm install coveralls && npm run cover && cat ./coverage/lcov.info | coveralls && rm -rf ./coverage",
+    "test": "npm run coveralls"
+  },
+  "readmeFilename": "README.md",
+  "license": "MPL-2.0"
+}

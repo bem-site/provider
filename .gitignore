@@ -9,9 +9,12 @@ lib-cov
 *.gz
 
 pids
+libs
 
 npm-debug.log
 node_modules
 coverage
 
-config/_config.json
+.enb/tmp
+src/*.bundles/*/*.*
+!src/*.bundles/*/*.bemdecl.js

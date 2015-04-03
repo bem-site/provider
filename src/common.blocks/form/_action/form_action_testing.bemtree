@@ -11,7 +11,7 @@ block('form').mod('action', 'testing')(
 
         return {
             block : 'button',
-            mods : { theme : 'normal', size : 'l', type : 'submit', disabled: disabled },
+            mods : { theme : 'islands', size : 'l', type : 'submit', disabled: disabled },
             icon : {
                 block : 'icon',
                 url : 'src/common.blocks/snapshot/__panel/lab.svg'

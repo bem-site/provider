@@ -1,10 +1,6 @@
 block('header').content()(function() {
     return [
         {
-            elem: 'updater',
-            data: this.ctx.data.updater
-        },
-        {
             elem: 'title',
             content: this.ctx.data.title
         }

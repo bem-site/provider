@@ -1,6 +1,5 @@
 - elems:
   - title
-  - updater
 
 - block: link
   mods: { theme: normal }

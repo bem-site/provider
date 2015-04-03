@@ -12,7 +12,7 @@ block('snapshot').elem('panel').content()(function() {
         {
             block : 'button',
             url : content.changesUrl,
-            mods : { theme : 'normal', size : 'l', type : 'link' },
+            mods : { theme : 'islands', size : 'l', type : 'link' },
             icon : {
                 block : 'icon',
                 url : 'src/common.blocks/snapshot/__panel/news.svg'

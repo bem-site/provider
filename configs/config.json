@@ -1,5 +1,6 @@
 {
-  "path": "./",
+  "title": "bem-site-provider",
+  "path": "./test/test-data",
   "logger": {
     "level": "debug"
   },

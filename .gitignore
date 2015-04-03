@@ -18,3 +18,4 @@ coverage
 .enb/tmp
 src/*.bundles/*/*.*
 !src/*.bundles/*/*.bemdecl.js
+test/test-data

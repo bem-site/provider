@@ -3,6 +3,7 @@ var fs = require('fs'),
     path = require('path'),
     vm = require('vm'),
 
+    _ = require('lodash'),
     vow = require('vow'),
     inherit = require('inherit'),
     vowNode = require('vow-node'),
@@ -40,19 +41,23 @@ module.exports = Template = inherit({
      */
     _rebuild: function () {
         return vow.all(
-            this._targets.map(function (item) {
+            _.values(this._targets).map(function (item) {
                 return this._builder(item).then(function () {
                     dropRequireCache(require, item);
                     return item;
                 }, this);
-            }))
+            }, this))
             .then(function () {
                 this._template = require(path.join(process.cwd(), this._targets['bemhtml']));
                 var p = path.join(process.cwd(), this._targets['bemtree']);
-                return vowNode.promisify(fs.readFile(p));
+                return vowNode.promisify(fs.readFile)(p, { encoding: 'utf-8' });
             }, this)
             .then(function (content) {
-                vm['runInNewContext'](content, this._baseContext);
+                try {
+                    vm['runInNewContext'](content, this._baseContext);
+                }catch (err) {
+                    console.log(err);
+                }
                 return this._baseContext;
             }, this);
     },
@@ -65,7 +70,7 @@ module.exports = Template = inherit({
      * @returns {*}
      */
     execute: function (context, request) {
-        var rebuild = process.env['NODE_ENV'] === 'development' ?
+        var rebuild = process.env['NODE_ENV'] !== 'production' ?
             this._rebuild() : vow.resolve(this._baseContext);
 
         return rebuild

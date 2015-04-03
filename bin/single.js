@@ -8,7 +8,7 @@ fs.readFile(configPath, { encoding: 'utf-8' }, function (err, config) {
     if (err) {
         throw err;
     } else {
-        server = new Server(config);
+        server = new Server(JSON.parse(config));
         server.start();
     }
 });

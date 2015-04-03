@@ -1,10 +1,10 @@
 {
-  "title": "bem-site-provider",
+  "title": "Bem Site Provider",
   "path": "./test/test-data",
+  "symlinks": ["testing", "production"],
   "logger": {
     "level": "debug"
   },
-  "title": "Bem Site Provider",
   "logs": {
     "output": "./logs/output.log",
     "error": "./logs/error.log"

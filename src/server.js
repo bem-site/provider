@@ -1,10 +1,13 @@
 var fs = require('fs'),
+    path = require('path'),
     util = require('util'),
     express = require('express'),
     st = require('serve-static'),
     cookieParser = require('cookie-parser'),
 
     _ = require('lodash'),
+    vow = require('vow'),
+    vowNode = require('vow-node'),
     inherit = require('inherit'),
     Logger = require('bem-site-logger'),
     master = require('bem-site-snapshot-master'),
@@ -25,6 +28,8 @@ module.exports = Server = inherit({
         this._options = options;
         this._logger = Logger.setOptions(options['logger']).createLogger(module);
         this._template = new Template({ level: 'common', bundle: 'index' });
+
+        this._options.path = path.resolve(this._options.path);
 
         this._master = options['yandex-disk'] ?
             new master.YDisk(options) :
@@ -51,8 +56,8 @@ module.exports = Server = inherit({
         this._server.get('/ping/:environment', this._route.ping.bind(this));
         this._server.get('/data/:environment', this._route.data.bind(this));
         this._server.get('/changes/:version', this._route.changes.bind(this));
-        this._server.post('/set/:environment/:version', this.getGuard.bind(this), this._route.set.bind(this));
-        this._server.post('/remove/:version', this.getGuard.bind(this), this._route.remove.bind(this));
+        this._server.post('/set/:environment/:version', this.getGuard(), this._route.set.bind(this));
+        this._server.post('/remove/:version', this.getGuard(), this._route.remove.bind(this));
         this._server.post('/model', this._route.model.bind(this));
     },
 
@@ -69,32 +74,60 @@ module.exports = Server = inherit({
     _route: {
 
         index: function (req, res) {
-            var _this = this,
-                context = {
-                    title: this.getTitle(),
-                    versions: []
-                };
+            var _this = this;
             this._master.getSnapshots(function (err, snapshots) {
                 if (err) {
                     _this._logger.error(err.message);
                     return res.status(500).end(err.message);
                 }
 
-                context.versions = snapshots.map(function (item) {
-                    return {
-                        date: item,
-                        changesUrl: util.format('/changes/%s', item),
-                        testingUrl: util.format('/set/testing/%s', item),
-                        productionUrl: util.format('/set/production/%s', item),
-                        removeUrl: util.format('/remove/%s', item),
-                        testing: false,
-                        production: false
-                    };
-                });
+                var markedSnashots = _this._options['symlinks'].reduce(function (prev, item) {
+                        prev[item] = vowNode.promisify(_this._master.getSnapshotNameForSymlink)
+                            .call(_this._master, item);
+                        return prev;
+                    }, {});
 
-                return _this._template.execute(_.extend({ block: 'page', view: 'index' }, { data: context }), req)
-                    .then(function (html) { res.status(200).end(html); })
-                    .fail(function (err) { res.status(500).end(err); });
+                vow.allResolved(markedSnashots)
+                    .then(function (result) {
+                        result = _.chain(result)
+                            .pick(function (value) { return value.isFulfilled(); })
+                            .mapValues(function (value) { return value.valueOf(); })
+                            .mapValues(function (value) { return path.basename(value); })
+                            .value();
+
+                        return _.chain(snapshots)
+                            .map(function (item) {
+                                return {
+                                    date: item,
+                                    changesUrl: util.format('/changes/%s', item),
+                                    removeUrl: util.format('/remove/%s', item)
+                                };
+                            })
+                            .map(function (item) {
+                                _this._options['symlinks'].forEach(function (symlink) {
+                                    item[symlink + 'Url'] = encodeURI(util.format('/set/%s/%s', symlink, item.date));
+                                    item[symlink] = item.date === result[symlink];
+                                });
+                                return item;
+                            })
+                            .thru(function (snapshots) {
+                                return {
+                                    title: _this.getTitle(),
+                                    versions: snapshots
+                                };
+                            })
+                            .value();
+                    })
+                    .then(function (context) {
+                        return _this._template.execute(
+                            _.extend({ block: 'page', view: 'index' }, { data: context }), req);
+                    })
+                    .then(function (html) {
+                        res.status(200).end(html);
+                    })
+                    .fail(function (err) {
+                        res.status(500).end(err);
+                    });
             });
         },
 

@@ -1,6 +1,7 @@
 var fs = require('fs'),
     path = require('path'),
     util = require('util'),
+    _ = require('lodash'),
     should = require('should'),
     Logger = require('bem-site-logger'),
     master = require('bem-site-snapshot-master'),
@@ -22,24 +23,58 @@ describe('src/server.js', function () {
         });
     });
 
-    it('initialization', function () {
-        var server = new Server(options);
-        server._options.should.be.ok;
-        server._options.should.be.instanceOf(Object);
+    describe('initialization', function () {
+        it('error: path was not set', function () {
+            var o = _.omit(options, 'path');
+            (function () { return new Server(o); }).should.throw('path was not set');
+        });
 
-        server._options.path.should.equal(path.resolve(options.path));
+        it('error: model path was not set', function () {
+            var o = _.omit(options, 'modelPath');
+            (function () { return new Server(o); }).should.throw('model path was not set');
+        });
 
-        server._logger.should.be.ok;
-        server._logger.should.be.instanceOf(Logger);
+        it('error: server options were not set', function () {
+            var o = _.omit(options, 'server');
+            (function () { return new Server(o); }).should.throw('server options were not set');
+        });
 
-        server._template.should.be.ok;
-        server._template.should.be.instanceOf(Template);
+        it ('with Yandex Disk options', function () {
+            var o = _.extend({}, options, { 'yandex-disk': {
+                    user: 'snapshot.master',
+                    password: '112233445566778899',
+                    namespace: 'test'
+                } }),
+                server = new Server(o);
+            server._master.should.be.ok;
+            server._master.should.be.instanceOf(master.YDisk);
+        });
 
-        server._master.should.be.ok;
-        server._master.should.be.instanceOf(master.Simple);
+        it ('for development environment', function () {
+            process.env['NODE_ENV'] = 'development';
+            new Server(options);
+            process.env['NODE_ENV'] = 'testing';
+        });
 
-        server._server.should.be.ok;
-        server._server.should.be.instanceOf(Function);
+        it('success', function () {
+            var server = new Server(options);
+            server._options.should.be.ok;
+            server._options.should.be.instanceOf(Object);
+
+            server._options.path.should.equal(path.resolve(options.path));
+
+            server._logger.should.be.ok;
+            server._logger.should.be.instanceOf(Logger);
+
+            server._template.should.be.ok;
+            server._template.should.be.instanceOf(Template);
+
+            server._master.should.be.ok;
+            server._master.should.be.instanceOf(master.Simple);
+
+            server._server.should.be.ok;
+            server._server.should.be.instanceOf(Function);
+        });
     });
 
     it('getGuard', function () {

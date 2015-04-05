@@ -1,6 +1,7 @@
 {
   "title": "Bem Site Provider",
   "path": "./test/test-data",
+  "modelPath": "./test/test-data",
   "symlinks": ["testing", "production"],
   "logger": {
     "level": "debug"

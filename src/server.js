@@ -1,6 +1,7 @@
 var fs = require('fs'),
     path = require('path'),
     util = require('util'),
+    zlib = require('zlib'),
     express = require('express'),
     st = require('serve-static'),
     cookieParser = require('cookie-parser'),
@@ -28,6 +29,18 @@ module.exports = Server = inherit({
         this._options = options;
         this._logger = Logger.setOptions(options['logger']).createLogger(module);
         this._template = new Template({ level: 'common', bundle: 'index' });
+
+        if (!this._options.path) {
+            throw new Error('path was not set');
+        }
+
+        if (!this._options['modelPath']) {
+            throw new Error('model path was not set');
+        }
+
+        if (!this._options['server']) {
+            throw new Error('server options were not set');
+        }
 
         this._options.path = path.resolve(this._options.path);
 
@@ -220,6 +233,11 @@ module.exports = Server = inherit({
             });
         },
 
+        /**
+         * Switches symlinks to snapshot
+         * @param {Object} req - http request object
+         * @param {Object} res - http response object
+         */
         set: function (req, res) {
             var _this = this,
                 environment = req.params['environment'],
@@ -259,10 +277,28 @@ module.exports = Server = inherit({
             });
         },
 
+        /**
+         * Receives model file, unzips it and place unzipped file into configured modelPath directory
+         * @param {Object} req - http request object
+         * @param {Object} res - http response object
+         */
         model: function (req, res) {
-            console.log(req);
-            console.log(res);
-            // TODO implement it
+            var zip = zlib.createGunzip(),
+                onSuccess = function () {
+                    console.info('new model has been received');
+                    res.status(200).send('ok');
+                },
+                onError = function (err) {
+                    console.error('error occur while receiving new model file', module);
+                    res.status(500).send('error ' + err);
+                };
+
+            req
+                .pipe(zip)
+                .pipe(fs.createWriteStream(this._options['modelPath']))
+                .on('error', onError)
+                .on('close', onSuccess)
+                .on('end', onSuccess);
         }
     },
 

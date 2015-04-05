@@ -32,14 +32,15 @@ module.exports = Server = inherit({
         this._options.path = path.resolve(this._options.path);
 
         this._master = options['yandex-disk'] ?
-            new master.YDisk(options) :
-            new master.Simple(options);
+            new master.YDisk(options) : // use api with yandex disk
+            new master.Simple(options); // use api without yandex disk
 
         this._server = express();
         this._server.set('port', options['server']['port'] || 3000);
         this._server.enable('trust proxy');
 
-        if (process.env['NODE_ENV'] !== 'production') {
+        // add enb server middleware for development environment
+        if (process.env['NODE_ENV'] === 'development') {
             this._server.use(require('enb/lib/server/server-middleware').createMiddleware({
                 cdir: process.cwd(),
                 noLog: false
@@ -61,33 +62,55 @@ module.exports = Server = inherit({
         this._server.post('/model', this._route.model.bind(this));
     },
 
+    /**
+     * Returns guard function for data-modifying requests
+     * @returns {Function}
+     */
     getGuard: function () {
         return function (req, res, next) {
             return next();
         };
     },
 
+    /**
+     * Returns configured application title
+     * @returns {*}
+     */
     getTitle: function () {
         return this._options.title;
     },
 
+    /**
+     * Returns express app function
+     * @returns {Function}
+     */
+    getApp: function () {
+        return this._server;
+    },
+
     _route: {
 
+        /**
+         * Index route for / requests. Returns html page with list of snapshots
+         * @param {Object} req - http request object
+         * @param {Object} res - http response object
+         */
         index: function (req, res) {
             var _this = this;
             this._master.getSnapshots(function (err, snapshots) {
                 if (err) {
                     _this._logger.error(err.message);
-                    return res.status(500).end(err.message);
+                    res.status(500);
+                    return res.end(err.message);
                 }
 
-                var markedSnashots = _this._options['symlinks'].reduce(function (prev, item) {
+                var markedSnapshots = _this._options['symlinks'].reduce(function (prev, item) {
                         prev[item] = vowNode.promisify(_this._master.getSnapshotNameForSymlink)
                             .call(_this._master, item);
                         return prev;
                     }, {});
 
-                vow.allResolved(markedSnashots)
+                vow.allResolved(markedSnapshots)
                     .then(function (result) {
                         result = _.chain(result)
                             .pick(function (value) { return value.isFulfilled(); })
@@ -123,14 +146,22 @@ module.exports = Server = inherit({
                             _.extend({ block: 'page', view: 'index' }, { data: context }), req);
                     })
                     .then(function (html) {
-                        res.status(200).end(html);
+                        res.status(200);
+                        return res.end(html);
                     })
                     .fail(function (err) {
-                        res.status(500).end(err);
-                    });
+                        res.status(500);
+                        return res.end(err);
+                    })
+                    .done();
             });
         },
 
+        /**
+         * Ping action. Returns string with snapshot name for given environment param
+         * @param {Object} req - http request object
+         * @param {Object} res - http response object
+         */
         ping: function (req, res) {
             var _this = this,
                 environment = req.params['environment'];
@@ -138,14 +169,21 @@ module.exports = Server = inherit({
             this._master.getSnapshotNameForSymlink(environment, function (err, result) {
                 if (err) {
                     _this._logger.error(err.message);
-                    res.status(500).end(err.message);
+                    res.status(500);
+                    res.end(err.message);
                 } else {
                     _this._logger.debug('ping action returns result %s', result);
-                    res.status(200).end(result);
+                    res.status(200);
+                    res.end(result);
                 }
             });
         },
 
+        /**
+         * Data action. Streams snapshot data to response
+         * @param {Object} req - http request object
+         * @param {Object} res - http response object
+         */
         data: function (req, res) {
             var _this = this,
                 environment = req.params['environment'];
@@ -157,10 +195,29 @@ module.exports = Server = inherit({
             });
         },
 
+        /**
+         * Index route for /changes/:version requests. Returns html page with list of snapshot changes
+         * @param {Object} req - http request object
+         * @param {Object} res - http response object
+         */
         changes: function (req, res) {
-            console.log(req);
-            console.log(res);
-            // TODO implement it
+            var _this = this,
+                version = req.params.version;
+            this._logger.info('changes controller action %s with params: %s', req.path, version);
+            this._master.getSnapshotChanges(version, function (err, changes) {
+                _this._template
+                    .execute(_.extend({ block: 'page', view: 'changes' },
+                        { data: _.merge(changes, { title: _this.getTitle() }) }), req)
+                    .then(function (html) {
+                        res.status(200);
+                        return res.end(html);
+                    })
+                    .fail(function () {
+                        res.status(500);
+                        return res.end();
+                    })
+                    .done();
+            });
         },
 
         set: function (req, res) {
@@ -172,7 +229,8 @@ module.exports = Server = inherit({
             this._master.switchSymlinkToSnapshot(environment, version, function (err) {
                 if (err) {
                     _this._logger.error(err.message);
-                    res.status(500).end(err.message);
+                    res.status(500);
+                    res.end(err.message);
                 } else {
                     _this._logger.debug('set action success for %s %s', environment, version);
                     res.redirect(302, '/');
@@ -180,6 +238,11 @@ module.exports = Server = inherit({
             });
         },
 
+        /**
+         * Removes snapshot by version request param
+         * @param {Object} req - http request object
+         * @param {Object} res - http response object
+         */
         remove: function (req, res) {
             var _this = this,
                 version = req.params.version;
@@ -187,7 +250,8 @@ module.exports = Server = inherit({
             this._master.removeSnapshot(version, function (err) {
                 if (err) {
                     _this._logger.error(err.message);
-                    res.status(500).end(err.message);
+                    res.status(500);
+                    res.end(err.message);
                 } else {
                     _this._logger.debug('snapshot version %s was removed from filesystem', version);
                     res.redirect(302, '/');
@@ -202,18 +266,27 @@ module.exports = Server = inherit({
         }
     },
 
-    start: function () {
+    /**
+     * Starts express server
+     */
+    start: function (callback) {
         var _this = this,
             port = this._server.get('port');
-        this._server.listen(port, function () {
-            _this._logger.info('Express server listening on port %s', port);
-            if (!port.toString().match(/\d{2,4}/)) {
-                try {
-                    fs.chmod(port, '0777');
-                } catch (err) {
-                    _this._logger.error('Can\'t chmod 0777 to socket');
+        this._template.rebuild().then(function () {
+            var server = this._server.listen(port, function (err) {
+                _this._logger.info('Express server listening on port %s', port);
+                if (!port.toString().match(/\d{2,4}/)) {
+                    try {
+                        fs.chmod(port, '0777');
+                    } catch (err) {
+                        _this._logger.error('Can\'t chmod 0777 to socket');
+                    }
                 }
-            }
-        });
+                callback && callback(err);
+            });
+            this.close = function () {
+                server.close();
+            };
+        }, this);
     }
 });

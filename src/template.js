@@ -32,14 +32,13 @@ module.exports = Template = inherit({
             console: console,
             Vow: vow
         });
-        this._rebuild();
     },
 
     /**
      * Rebuilds bemtree and bemhtml templates for development environment
      * @returns {*}
      */
-    _rebuild: function () {
+    rebuild: function () {
         return vow.all(
             _.values(this._targets).map(function (item) {
                 return this._builder(item).then(function () {
@@ -53,11 +52,7 @@ module.exports = Template = inherit({
                 return vowNode.promisify(fs.readFile)(p, { encoding: 'utf-8' });
             }, this)
             .then(function (content) {
-                try {
-                    vm['runInNewContext'](content, this._baseContext);
-                }catch (err) {
-                    console.log(err);
-                }
+                vm['runInNewContext'](content, this._baseContext);
                 return this._baseContext;
             }, this);
     },
@@ -70,8 +65,8 @@ module.exports = Template = inherit({
      * @returns {*}
      */
     execute: function (context, request) {
-        var rebuild = process.env['NODE_ENV'] !== 'production' ?
-            this._rebuild() : vow.resolve(this._baseContext);
+        var rebuild = process.env['NODE_ENV'] === 'development' ?
+            this.rebuild() : vow.resolve(this._baseContext);
 
         return rebuild
             .then(function () {

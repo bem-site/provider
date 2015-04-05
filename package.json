@@ -24,8 +24,8 @@
     "express": "4.x",
     "forever": "^0.14.x",
     "fs-extra": "^0.18.x",
-    "json-stringify-safe": "5.0.x",
     "inherit": "^2.2.x",
+    "json-stringify-safe": "5.0.x",
     "lodash": "^3.1.x",
     "luster": "~0.5.x",
     "luster-log-file": "~0.2.x",
@@ -42,17 +42,20 @@
     "enb-diverse-js": "^0.1.x",
     "enb-modules": "^0.1.2",
     "enb-stylus": "^1.1.x",
+    "istanbul": "^0.3.x",
+    "jscs": "^1.11.x",
+    "jshint": "~2.6.x",
     "mocha": "~2.2.x",
     "mocha-lcov-reporter": "0.0.x",
+    "nock": "^1.4.x",
     "should": "~5.2.x",
-    "istanbul": "^0.3.x",
-    "jshint": "~2.6.x",
-    "jscs": "^1.11.x"
+    "supertest": "^0.15.0"
   },
   "scripts": {
     "deps": "bower i",
     "enb": "enb make --no-cache",
-    "make": "npm run deps && npm run enb",
+    "stub": "node bin/stub.js",
+    "make": "npm run deps && npm run enb && npm run stub",
     "start": "node bin/single.js",
     "cluster": "node bin/cluster.js",
     "mocha": "NODE_ENV=testing node_modules/.bin/mocha",
@@ -60,7 +63,7 @@
     "codestyle": "node_modules/.bin/jshint . && node_modules/.bin/jscs -c .jscs.js .",
     "cover": "istanbul cover _mocha",
     "coveralls": "npm install coveralls && npm run cover && cat ./coverage/lcov.info | coveralls && rm -rf ./coverage",
-    "test": "npm run coveralls"
+    "test": "npm run make && npm run coveralls"
   },
   "readmeFilename": "README.md",
   "license": "MPL-2.0"

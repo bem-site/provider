@@ -6,6 +6,8 @@ Data provider web service
 [![David](https://img.shields.io/david/bem-site/provider.svg)](https://david-dm.org/bem-site/provider)
 [![David](https://img.shields.io/david/dev/bem-site/provider.svg)](https://david-dm.org/bem-site/provider#info=devDependencies)
 
+![GitHub Logo](./icon-cable.png)
+
 ### Installation
 
 * At first you should clone this repository to your local filesystem:

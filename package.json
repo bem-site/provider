@@ -47,7 +47,6 @@
     "jshint": "~2.6.x",
     "mocha": "~2.2.x",
     "mocha-lcov-reporter": "0.0.x",
-    "nock": "^1.4.x",
     "request": "^2.55.x",
     "should": "~5.2.x",
     "supertest": "^0.15.0"

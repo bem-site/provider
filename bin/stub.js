@@ -1,5 +1,6 @@
 var fs = require('fs'),
     path = require('path'),
+    zlib = require('zlib'),
 
     _ = require('lodash'),
     moment = require('moment'),
@@ -64,6 +65,11 @@ fs.readFile('./configs/config.json', { encoding: 'utf-8' }, function (err, confi
 
     fs.symlinkSync(path.join(snapshotsFolder, snapshotNames[1]), path.join(baseFolder, 'testing'), 'dir');
     fs.symlinkSync(path.join(snapshotsFolder, snapshotNames[3]), path.join(baseFolder, 'production'), 'dir');
+
+    fsExtra.mkdirpSync(path.join(baseFolder, 'model'));
+    var modelPath = path.join(baseFolder, 'model.json');
+    fsExtra.writeJSONSync(modelPath, { name: 'model' });
+
     console.info('-- create stub data for testing end --');
 });
 

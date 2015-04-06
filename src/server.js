@@ -289,13 +289,14 @@ module.exports = Server = inherit({
                     res.status(200).send('ok');
                 },
                 onError = function (err) {
-                    console.error('error occur while receiving new model file', module);
+                    console.error(err.message);
+                    console.error('error occur while receiving new model file');
                     res.status(500).send('error ' + err);
                 };
 
             req
                 .pipe(zip)
-                .pipe(fs.createWriteStream(this._options['modelPath']))
+                .pipe(fs.createWriteStream(path.join(this._options['modelPath'], 'model.json')))
                 .on('error', onError)
                 .on('close', onSuccess)
                 .on('end', onSuccess);

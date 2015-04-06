@@ -1,9 +1,11 @@
 var util = require('util'),
     path = require('path'),
     http = require('http'),
+    zlib = require('zlib'),
     fs = require('fs'),
     should = require('should'),
-    request = require('supertest'),
+    request = require('request'),
+    supertest = require('supertest'),
     Server = require('../src/server');
 
 describe('api', function () {
@@ -12,7 +14,7 @@ describe('api', function () {
 
     before(function (done) {
         var configPath = path.join(process.cwd(), 'configs/config.json');
-        baseUrl = util.format('http://%s:%s', 'localhost', 3000);
+        baseUrl = util.format('http://%s:%s', '127.0.0.1', 3000);
         fs.readFile(configPath, { encoding: 'utf-8' }, function (err, config) {
             if (err) {
                 throw err;
@@ -27,7 +29,7 @@ describe('api', function () {
 
     describe('GET /', function () {
         it('success', function (done) {
-            request(server.getApp())
+            supertest(server.getApp())
                 .get('/')
                 .expect(200)
                 .end(function (err) {
@@ -48,9 +50,9 @@ describe('api', function () {
         });
 
         it('success', function (done) {
-            request(server.getApp())
+            supertest(server.getApp())
                 .get('/ping/testing')
-                .expect(200, snapshotName)
+                .expect(200)
                 .end(function (err) {
                     if (err) return done(err);
                     done();
@@ -58,7 +60,7 @@ describe('api', function () {
         });
 
         it('error', function (done) {
-            request(server.getApp())
+            supertest(server.getApp())
                 .get('/ping/staging')
                 .expect(500)
                 .end(function (err) {
@@ -70,7 +72,7 @@ describe('api', function () {
 
     describe('GET /data', function () {
         it('success', function (done) {
-            request(server.getApp())
+            supertest(server.getApp())
                 .get('/data/testing')
                 .expect(200)
                 .end(function (err) {
@@ -91,7 +93,7 @@ describe('api', function () {
         });
 
         it('success', function (done) {
-            request(server.getApp())
+            supertest(server.getApp())
                 .get('/changes/' + snapshotName)
                 .expect(200)
                 .end(function (err) {
@@ -101,7 +103,7 @@ describe('api', function () {
         });
 
         it('error', function (done) {
-            request(server.getApp())
+            supertest(server.getApp())
                 .get('/changes/null')
                 .expect(500)
                 .end(function (err) {
@@ -122,7 +124,7 @@ describe('api', function () {
         });
 
         it('success', function (done) {
-            request(server.getApp())
+            supertest(server.getApp())
                 .post('/set/testing/' + snapshotName)
                 .expect(302)
                 .end(function (err) {
@@ -143,7 +145,7 @@ describe('api', function () {
         });
 
         it('success', function (done) {
-            request(server.getApp())
+            supertest(server.getApp())
                 .post('/remove/' + snapshotNames[2])
                 .expect(302)
                 .end(function (err) {
@@ -153,11 +155,28 @@ describe('api', function () {
         });
 
         it('error', function (done) {
-            request(server.getApp())
+            supertest(server.getApp())
                 .post('/remove/' + snapshotNames[0])
                 .expect(500)
                 .end(function (err) {
                     if (err) return done(err);
+                    done();
+                });
+        });
+    });
+
+    describe('POST /model', function () {
+        it ('success', function (done) {
+            var modelPath = path.join(__dirname, './test-data/model.json');
+            fs['createReadStream'](modelPath)
+                .pipe(zlib.createGzip())
+                .pipe(request.post('http://127.0.0.1:3000' + '/model'))
+                .on('close', function () {
+                    fs.existsSync(path.resolve(__dirname, './test-data/model/model.json')).should.equal(true);
+                    done();
+                })
+                .on('end', function () {
+                    fs.existsSync(path.resolve(__dirname, './test-data/model/model.json')).should.equal(true);
                     done();
                 });
         });

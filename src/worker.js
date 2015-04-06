@@ -9,12 +9,13 @@ var fs = require('fs'),
     server;
 
 if (worker['isWorker']) {
-    logger.info('Start worker %s', worker['wid']);
+    logger.info('Start worker: %s', worker['wid']);
     fs.readFile(configPath, { encoding: 'utf-8' }, function (err, config) {
         if (err) {
+            logger.error('Error occur while opening configuration file %s', configPath);
             throw err;
         } else {
-            server = new Server(config);
+            server = new Server(JSON.parse(config));
             server.start();
         }
     });

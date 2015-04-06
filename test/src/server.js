@@ -77,12 +77,6 @@ describe('src/server.js', function () {
         });
     });
 
-    it('getGuard', function () {
-        var server = new Server(options);
-        server.getGuard().should.be.ok;
-        server.getGuard().should.be.instanceOf(Function);
-    });
-
     it ('getTitle', function () {
         var server = new Server(options);
         server.getTitle().should.be.ok;

@@ -12,6 +12,7 @@ var fs = require('fs'),
     inherit = require('inherit'),
     Logger = require('bem-site-logger'),
     master = require('bem-site-snapshot-master'),
+    protect = require(path.join(process.cwd(), './src/protect.js')),
     Template = require('./template'),
     Server;
 
@@ -70,19 +71,9 @@ module.exports = Server = inherit({
         this._server.get('/ping/:environment', this._route.ping.bind(this));
         this._server.get('/data/:environment', this._route.data.bind(this));
         this._server.get('/changes/:version', this._route.changes.bind(this));
-        this._server.post('/set/:environment/:version', this.getGuard(), this._route.set.bind(this));
-        this._server.post('/remove/:version', this.getGuard(), this._route.remove.bind(this));
+        this._server.post('/set/:environment/:version', protect(this._options), this._route.set.bind(this));
+        this._server.post('/remove/:version', protect(this._options), this._route.remove.bind(this));
         this._server.post('/model', this._route.model.bind(this));
-    },
-
-    /**
-     * Returns guard function for data-modifying requests
-     * @returns {Function}
-     */
-    getGuard: function () {
-        return function (req, res, next) {
-            return next();
-        };
     },
 
     /**

@@ -35,10 +35,12 @@
     "vow-node": "^0.2.x"
   },
   "devDependencies": {
+    "borschik": "^1.0.x",
     "bower": "~1.4.x",
     "enb": "^0.15.x",
     "enb-autoprefixer": "^0.2.x",
     "enb-bemxjst": "^1.2.x",
+    "enb-borschik": "^1.0.x",
     "enb-diverse-js": "^0.1.x",
     "enb-modules": "^0.2.x",
     "enb-stylus": "^1.1.x",

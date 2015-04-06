@@ -43,13 +43,13 @@ module.exports = function (config) {
         });
     });
 
-    config.mode('production', function (modeConfig) {
-        config.nodes('*.bundles/*', function (nodeConfig) {
+    config.mode('production', function () {
+        config.nodes('src/*.bundles/*', function (nodeConfig) {
             nodeConfig.addTechs([
-                [require('enb/techs/borschik'), { sourceTarget: '?.css', destTarget: '?.min.css' }],
-                [require('enb/techs/borschik'), { sourceTarget: '?.bemtree.js', destTarget: '?.min.bemtree.js' }],
-                [require('enb/techs/borschik'), { sourceTarget: '?.js', destTarget: '?.min.js' }],
-                [require('enb/techs/borschik'), { sourceTarget: '?.bemhtml.js', destTarget: '?.min.bemhtml.js' }]
+                [require('enb-borschik/techs/borschik'), { sourceTarget: '?.css', destTarget: '?.min.css' }],
+                [require('enb-borschik/techs/borschik'), { sourceTarget: '?.bemtree.js', destTarget: '?.min.bemtree.js' }],
+                [require('enb-borschik/techs/borschik'), { sourceTarget: '?.js', destTarget: '?.min.js' }],
+                [require('enb-borschik/techs/borschik'), { sourceTarget: '?.bemhtml.js', destTarget: '?.min.bemhtml.js' }]
             ]);
         });
     });

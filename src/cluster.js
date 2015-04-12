@@ -33,7 +33,7 @@ fsExtra.readJSON(path.resolve(process.cwd(), './configs/config.json'), function 
 
     luster['configure']({
         app: './worker.js',
-        workers: 4,
+        workers: config['cluster']['workers'],
         control: {
             forkTimeout: 1000,
             stopTimeout: 1000,

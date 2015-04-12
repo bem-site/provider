@@ -10,6 +10,9 @@
     "output": "./logs/output.log",
     "error": "./logs/error.log"
   },
+  "cluster": {
+    "workers": 2
+  },
   "server": {
     "port": 3000
   }

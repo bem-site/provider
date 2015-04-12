@@ -19,3 +19,4 @@ coverage
 src/*.bundles/*/*.*
 !src/*.bundles/*/*.bemdecl.js
 test/test-data
+config/_config.json

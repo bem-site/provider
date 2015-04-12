@@ -1,6 +1,6 @@
 {
   "name": "bem-site-provider",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "repository": {
     "type": "git",
     "url": "git://github.com/bem-site/provider.git"

@@ -4,7 +4,7 @@ var fs = require('fs'),
     Logger = require('bem-site-logger'),
     Server = require('./server'),
 
-    configPath = path.join(process.cwd(), 'configs/config.json'),
+    configPath = path.join(process.cwd(), './configs/_config.json'),
     logger = Logger.createLogger(module),
     server;
 

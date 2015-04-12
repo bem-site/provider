@@ -11,7 +11,8 @@
   ],
   "contributors": [
     "Andrey Kuznetsov <andrey.kuznetsov48@yandex.ua> (http://github.com/tormozz48)",
-    "Nikolay Ilchenko <tavria@yandex-team.ru> (http://github.com/tavriaforever)"
+    "Nikolay Ilchenko <tavria@yandex-team.ru> (http://github.com/tavriaforever)",
+    "Gela Konstantinova <gela-d@yandex-team.ru> (http://github.com/gela-d)"
   ],
   "engines": {
     "node": ">= 0.8.0"
@@ -57,6 +58,7 @@
     "deps": "bower i",
     "enb": "enb make --no-cache",
     "stub": "node bin/stub.js",
+    "config": "cp -i config/config.json config/_config.json",
     "make": "npm run deps && npm run enb && npm run stub",
     "start": "node bin/single.js",
     "cluster": "node bin/cluster.js",

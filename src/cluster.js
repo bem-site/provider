@@ -4,7 +4,7 @@ var util = require('util'),
     luster = require('luster'),
     Logger = require('bem-site-logger');
 
-fsExtra.readJSON(path.resolve(process.cwd(), './configs/config.json'), function (error, config) {
+fsExtra.readJSON(path.resolve(process.cwd(), './configs/_config.json'), function (error, config) {
     if (error) {
         throw new Error('Configuration file can\'t be open or parsed!');
     }

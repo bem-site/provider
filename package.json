@@ -58,7 +58,7 @@
     "deps": "bower i",
     "enb": "enb make --no-cache",
     "stub": "node bin/stub.js",
-    "config": "cp -i config/config.json config/_config.json",
+    "config": "cp -i configs/config.json configs/_config.json",
     "make": "npm run deps && npm run enb && npm run stub",
     "start": "node bin/single.js",
     "cluster": "node bin/cluster.js",
